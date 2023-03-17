@@ -6,6 +6,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"strconv"
+
+	"github.com/garcia-jc/profiling/fib/mathx"
 )
 
 func main() {
@@ -13,7 +15,7 @@ func main() {
 		number := r.URL.Query().Get("n")
 		n, _ := strconv.Atoi(number)
 		log.Println(n)
-		out := fib(uint(n))
+		out := mathx.Fib(uint(n))
 		log.Println(out)
 		fmt.Fprint(w, out)
 	}
@@ -21,15 +23,4 @@ func main() {
 	addr := ":6060"
 	log.Println("starting server at", addr)
 	log.Println(http.ListenAndServe(addr, nil))
-}
-
-func fib(n uint) uint {
-	switch n {
-	case 0:
-		return 0
-	case 1:
-		return 1
-	default:
-		return fib(n-1) + fib(n-2)
-	}
 }
