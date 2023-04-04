@@ -17,13 +17,15 @@ type Item struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	} `json:"repo"`
-	Payload struct {
-		Ref          string `json:"ref"`
-		RefType      string `json:"ref_type"`
-		MasterBranch string `json:"master_branch"`
-		Description  string `json:"description"`
-		PusherType   string `json:"pusher_type"`
-	} `json:"payload"`
+	Payload   Payload   `json:"payload"`
 	Public    bool      `json:"public"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Payload struct {
+	Ref          string `json:"ref"`
+	RefType      string `json:"ref_type"`
+	MasterBranch string `json:"master_branch"`
+	Description  string `json:"description"`
+	PusherType   string `json:"pusher_type"`
 }

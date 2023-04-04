@@ -1,24 +1,30 @@
-create-profile:
-	go test -cpuprofile=profile-regular.out -benchtime=180s -bench .
+BENCHTIME?=60s
 
-pprof:
-	go tool pprof -http=:9001 functional.test profile-regular.out;
+all: clean bench bench-pgo bench-compare
 
-pprof-pgo:
-	mv profile.out profile-pgo.out;
-	go tool pprof -http=:9002 functional.test profile-pgo.out;
-
-inline:
-	go build -gcflags="-m" . 2> inline-original.txt
-
-inline-pgo:
-	go build -pgo=profile-regular.out -gcflags="-m" . 2> inline-pgo.txt
+clean:
+	echo "===> cleaning up generated files"
+	rm -f bench-* functional-*.test inline-*.txt profile-*.out
 
 bench:
-	go test -bench=. -benchtime=180s > bench-original.txt
+	echo "===> start benchmark"
+	go test -cpuprofile=profile-regular.out -cpu=1,2,4,6 -benchtime=$(BENCHTIME) -bench . | tee bench-original.txt
+	mv functional.test functional-regular.test
 
 bench-pgo:
-	go test -pgo=profile-regular.out -bench=. -benchtime=180s > bench-pgo.txt
+	echo "===> start benchmark using PGO"
+	go test -pgo=profile-regular.out -cpuprofile=profile-pgo.out -benchtime=$(BENCHTIME) -cpu=1,2,4,6 -bench=. | tee bench-pgo.txt
+	mv functional.test functional-pgo.test
 
-bench-compare:
+bench-compare: dev-tools
+	echo "===> comparing benchmarks"
 	benchstat bench-original.txt bench-pgo.txt
+
+pprof:
+	go tool pprof -http=:9001 functional-regular.test profile-regular.out;
+
+pprof-pgo:
+	go tool pprof -http=:9002 functional-pgo.test profile-pgo.out;
+	
+dev-tools:
+	go install golang.org/x/perf/cmd/benchstat@latest
