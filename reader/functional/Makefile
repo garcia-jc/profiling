@@ -1,5 +1,5 @@
-BENCHTIME?=60s
-BENCHFLAGS=-benchtime=30s -cpu=2,4,8 # -benchtime=$(BENCHTIME)
+BENCHTIME?=30s
+BENCHFLAGS=-count=2 -cpu=2,4,8 -benchtime=$(BENCHTIME)
 
 all: clean bench bench-pgo bench-compare
 
