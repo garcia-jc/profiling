@@ -1,5 +1,5 @@
 BENCHTIME?=60s
-BENCHFLAGS=-benchtime=100x -cpu=1,2,4,6,8 # -benchtime=$(BENCHTIME)
+BENCHFLAGS=-benchtime=30s -cpu=2,4,8 # -benchtime=$(BENCHTIME)
 
 all: clean bench bench-pgo bench-compare
 
@@ -21,11 +21,11 @@ bench-compare: dev-tools
 	echo "===> comparing benchmarks"
 	benchstat bench-original.txt bench-pgo.txt
 
-pprof:
+pprof: bench
 	go tool pprof -http=:9001 functional-regular.test profile-regular.out;
 
-pprof-pgo:
-	go tool pprof -http=:9002 functional-pgo.test profile-pgo.out;
+pprof-pgo: bench-pgo
+	go tool pprof -http=:9002 functional-pgo.test profile-pgo.out
 	
 dev-tools:
 	go install golang.org/x/perf/cmd/benchstat@latest
